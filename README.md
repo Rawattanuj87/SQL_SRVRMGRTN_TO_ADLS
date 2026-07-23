@@ -58,6 +58,7 @@ Queries control table parameters (TableSchema, TableName, WatermarkColumn, LastL
 SQL
 SELECT TableSchema, TableName, WatermarkColumn, LastLoadValue 
 FROM dbo.ADF_Watermark_Table;
+
 2. Child Pipeline (Delta Identification & Extraction)
 Calculates current maximum watermark value in the target table:
 
