@@ -1,0 +1,191 @@
+{
+	"name": "PL_CHLD_INCRMNTLTB_TR",
+	"properties": {
+		"activities": [
+			{
+				"name": "LK_UP_MAX_VALUERR",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": {
+							"value": "SELECT MAX(@{pipeline().parameters.WatermarkColumn}) AS MaxValue\nFROM @{pipeline().parameters.TableSchema}.@{pipeline().parameters.TableName}",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_LKUPP_MAX_VLUE",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableSchema": {
+								"value": "@pipeline().parameters.TableSchema",
+								"type": "Expression"
+							},
+							"TableName": {
+								"value": "@pipeline().parameters.TableName",
+								"type": "Expression"
+							}
+						}
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "IF_NEW_RECORD_EXSTS",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "LK_UP_MAX_VALUERR",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@or(equals(pipeline().parameters.LastLoadValue, null), greater(int(activity('LK_UP_MAX_VALUERR').output.firstRow.MaxValue), int(pipeline().parameters.LastLoadValue)))",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "CPY_FLL_INCRMTLLOAD_TBLE",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": {
+										"value": "@concat(\n    'SELECT * FROM ',\n    pipeline().parameters.TableSchema, '.', pipeline().parameters.TableName,\n    if(\n        equals(pipeline().parameters.LastLoadValue, null),\n        '',\n        concat(\n            ' WHERE ', pipeline().parameters.WatermarkColumn,\n            ' > ''', pipeline().parameters.LastLoadValue, ''''\n        )\n    )\n)",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_LKUPP_MAX_VLUE",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableSchema": {
+											"value": "@pipeline().parameters.TableSchema",
+											"type": "Expression"
+										},
+										"TableName": {
+											"value": "@pipeline().parameters.TableName",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_SQLTBLE_PARQ",
+									"type": "DatasetReference",
+									"parameters": {
+										"Table_Name": {
+											"value": "@pipeline().parameters.TableName",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "EXECUTE_UPDTEPL",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "CPY_FLL_INCRMTLLOAD_TBLE",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "PL_CHILD_STRDPROD_TR",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"TableSchema": {
+										"value": "@pipeline().parameters.TableSchema",
+										"type": "Expression"
+									},
+									"TableName": {
+										"value": "@pipeline().parameters.TableName",
+										"type": "Expression"
+									},
+									"WatermarkColumn": {
+										"value": "@pipeline().parameters.WatermarkColumn",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"TableSchema": {
+				"type": "string"
+			},
+			"TableName": {
+				"type": "string"
+			},
+			"WatermarkColumn": {
+				"type": "string"
+			},
+			"LastLoadValue": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-07-20T14:33:32Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

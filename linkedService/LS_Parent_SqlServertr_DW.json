@@ -1,0 +1,21 @@
+{
+	"name": "LS_Parent_SqlServertr_DW",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"server": "DESKTOP-0EKAJA7\\SQLEXPRESS",
+			"database": "RetailtrDW_Dev",
+			"encrypt": "mandatory",
+			"trustServerCertificate": true,
+			"authenticationType": "SQL",
+			"userName": "tanujrwt",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI2YTU2OTdmNC02OWZhLTQ5ZGEtOTFmZi02ODIzYTNiODU4MWQiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "integrationRuntime1",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

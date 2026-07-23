@@ -1,0 +1,95 @@
+{
+	"name": "PL_PARENTPIPELINE_TRR",
+	"properties": {
+		"activities": [
+			{
+				"name": "LKUP_SQLTBLE_DW_WTRMRK",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": {
+							"value": "SELECT TableSchema, TableName, WatermarkColumn,\nLastLoadValue FROM dbo.ADF_Watermark_Table;",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_SQLSRVR_TBLELKUP",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "FORECHSQLTBLE",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "LKUP_SQLTBLE_DW_WTRMRK",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('LKUP_SQLTBLE_DW_WTRMRK').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "EXEC_SQL_INCRTBLE",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "PL_CHLD_INCRMNTLTB_TR",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"TableSchema": {
+										"value": "@item().TableSchema",
+										"type": "Expression"
+									},
+									"TableName": {
+										"value": "@item().TableName",
+										"type": "Expression"
+									},
+									"WatermarkColumn": {
+										"value": "@item().WatermarkColumn",
+										"type": "Expression"
+									},
+									"LastLoadValue": {
+										"value": "@item().LastLoadValue",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2026-07-19T11:21:08Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

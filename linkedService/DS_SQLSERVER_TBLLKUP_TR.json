@@ -1,0 +1,21 @@
+{
+	"name": "DS_SQLSERVER_TBLLKUP_TR",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"server": "DESKTOP-0EKAJA7\\SQLEXPRESS",
+			"database": "RetailtrDW_Dev",
+			"encrypt": "optional",
+			"trustServerCertificate": true,
+			"authenticationType": "SQL",
+			"userName": "tanujrwt",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJhMWMzOWY3Yi0wYWY2LTQ0Y2YtYTZlMC0zZTk5NDY4NmE5MWQiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "integrationRuntime1",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

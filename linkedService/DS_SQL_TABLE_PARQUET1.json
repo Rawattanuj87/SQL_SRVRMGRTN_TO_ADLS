@@ -1,0 +1,16 @@
+{
+	"name": "DS_SQL_TABLE_PARQUET1",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://adlsdevprojectmigrtn003.dfs.core.windows.net/",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiIyNjEwN2Q5Ny1mYjdjLTRjMzctODY5MC1lMzM0YzY5NzMwNDAiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "integrationRuntime1",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

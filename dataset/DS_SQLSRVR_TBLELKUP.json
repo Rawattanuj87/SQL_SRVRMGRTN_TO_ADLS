@@ -1,0 +1,13 @@
+{
+	"name": "DS_SQLSRVR_TBLELKUP",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLSRVR_TBLELKUP",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
